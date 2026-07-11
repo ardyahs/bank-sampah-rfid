@@ -88,6 +88,7 @@ func main() {
 				r.Delete("/admin/produk/{id}", env.DeleteProduk)
 
 				r.Get("/admin/transaksi", env.ListSemuaTransaksi)
+				r.Post("/admin/setor-manual", env.ManualSetor)
 			})
 		})
 	})

@@ -77,4 +77,15 @@ export const api = {
     request<any>(`/api/admin/produk/${id}`, { method: "DELETE" }),
 
   semuaTransaksi: () => request<any[]>("/api/admin/transaksi"),
+
+  setorManual: (rumahTanggaId: string, jenisSampahId: string, beratKg: number) =>
+    request<any>("/api/admin/setor-manual", {
+      method: "POST",
+      body: JSON.stringify({
+        rumah_tangga_id: rumahTanggaId,
+        jenis_sampah_id: jenisSampahId,
+        berat_kg: beratKg,
+      }),
+    }),
+};
 };

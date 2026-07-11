@@ -24,6 +24,12 @@ type Transaksi = {
   created_at: string;
 };
 
+type JenisSampah = {
+  id: string;
+  nama: string;
+  poin_per_kg: number;
+};
+
 const emptyWargaForm = {
   nama_kepala_keluarga: "",
   alamat: "",
@@ -35,16 +41,19 @@ const emptyWargaForm = {
 };
 
 const emptyProdukForm = { nama: "", poin_dibutuhkan: 0, stok: 0 };
+const emptyManualForm = { rumah_tangga_id: "", jenis_sampah_id: "", berat_kg: 0 };
 
 export default function AdminPage() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [tab, setTab] = useState<"warga" | "produk" | "transaksi">("warga");
+  const [tab, setTab] = useState<"warga" | "produk" | "transaksi" | "manual">("warga");
 
   const [warga, setWarga] = useState<Warga[]>([]);
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
+  const [jenisSampahList, setJenisSampahList] = useState<JenisSampah[]>([]);
   const [wargaForm, setWargaForm] = useState(emptyWargaForm);
   const [produkForm, setProdukForm] = useState(emptyProdukForm);
+  const [manualForm, setManualForm] = useState(emptyManualForm);
   const [pesan, setPesan] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -61,12 +70,14 @@ export default function AdminPage() {
   async function muatSemua() {
     setLoading(true);
     try {
-      const [wargaData, transaksiData] = await Promise.all([
+      const [wargaData, transaksiData, jenisSampahData] = await Promise.all([
         api.listWarga(),
         api.semuaTransaksi(),
+        api.jenisSampah(),
       ]);
       setWarga(wargaData);
       setTransaksi(transaksiData);
+      setJenisSampahList(jenisSampahData);
     } catch (err) {
       setPesan(err instanceof ApiError ? err.message : "Gagal memuat data");
     } finally {
@@ -113,6 +124,23 @@ export default function AdminPage() {
     }
   }
 
+  async function kirimManual(e: React.FormEvent) {
+    e.preventDefault();
+    setPesan("");
+    try {
+      const hasil = await api.setorManual(
+        manualForm.rumah_tangga_id,
+        manualForm.jenis_sampah_id,
+        manualForm.berat_kg
+      );
+      setManualForm(emptyManualForm);
+      setPesan(`Transaksi manual berhasil disimpan. Poin didapat: ${hasil.poin_didapat}.`);
+      muatSemua();
+    } catch (err) {
+      setPesan(err instanceof ApiError ? err.message : "Gagal menyimpan transaksi manual");
+    }
+  }
+
   if (loading) return <p className="p-6">Memuat...</p>;
 
   return (
@@ -120,7 +148,7 @@ export default function AdminPage() {
       <Navbar user={user} />
       <main className="max-w-5xl mx-auto p-6 space-y-6">
         <div className="flex gap-2">
-          {(["warga", "produk", "transaksi"] as const).map((t) => (
+          {(["warga", "produk", "manual", "transaksi"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -128,7 +156,13 @@ export default function AdminPage() {
                 tab === t ? "bg-primary text-white" : "bg-white text-gray-600 border"
               }`}
             >
-              {t === "warga" ? "Kelola Warga" : t === "produk" ? "Produk Tukar" : "Monitor Transaksi"}
+              {t === "warga"
+                ? "Kelola Warga"
+                : t === "produk"
+                ? "Produk Tukar"
+                : t === "manual"
+                ? "Input Manual"
+                : "Monitor Transaksi"}
             </button>
           ))}
         </div>
@@ -213,6 +247,44 @@ export default function AdminPage() {
                 onChange={(e) => setProdukForm({ ...produkForm, stok: Number(e.target.value) })} />
               <button className="sm:col-span-3 bg-primary text-white rounded py-2 font-medium">
                 Simpan Produk
+              </button>
+            </form>
+          </section>
+        )}
+
+        {tab === "manual" && (
+          <section className="bg-white rounded-lg shadow p-6">
+            <h2 className="font-semibold mb-1">Input Transaksi Manual</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Dipakai kalau alat RFID belum siap/rusak, atau untuk mengoreksi transaksi yang terlewat.
+            </p>
+            <form onSubmit={kirimManual} className="grid sm:grid-cols-3 gap-3">
+              <select required className="border rounded px-3 py-2"
+                value={manualForm.rumah_tangga_id}
+                onChange={(e) => setManualForm({ ...manualForm, rumah_tangga_id: e.target.value })}>
+                <option value="">Pilih Rumah Tangga</option>
+                {warga.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.nama_kepala_keluarga} (RT {w.rt})
+                  </option>
+                ))}
+              </select>
+              <select required className="border rounded px-3 py-2"
+                value={manualForm.jenis_sampah_id}
+                onChange={(e) => setManualForm({ ...manualForm, jenis_sampah_id: e.target.value })}>
+                <option value="">Pilih Jenis Sampah</option>
+                {jenisSampahList.map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.nama} ({j.poin_per_kg} poin/kg)
+                  </option>
+                ))}
+              </select>
+              <input required type="number" step="0.01" min="0.01" placeholder="Berat (kg)"
+                className="border rounded px-3 py-2"
+                value={manualForm.berat_kg || ""}
+                onChange={(e) => setManualForm({ ...manualForm, berat_kg: Number(e.target.value) })} />
+              <button className="sm:col-span-3 bg-primary text-white rounded py-2 font-medium">
+                Simpan Transaksi
               </button>
             </form>
           </section>
