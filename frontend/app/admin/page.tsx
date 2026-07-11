@@ -30,6 +30,29 @@ type JenisSampah = {
   poin_per_kg: number;
 };
 
+type Produk = {
+  id: string;
+  nama: string;
+  poin_dibutuhkan: number;
+  stok: number;
+};
+
+const PRESET_PRODUK = [
+  "Beras 1kg",
+  "Beras 5kg",
+  "Minyak Goreng 1 Liter",
+  "Gula Pasir 1kg",
+  "Sabun Mandi",
+  "Sabun Cuci/Deterjen",
+  "Mie Instan (1 Dus)",
+  "Telur 1kg",
+  "Kopi Sachet (1 Renceng)",
+  "Teh Celup (1 Kotak)",
+  "Kecap 1 Botol",
+  "Garam 1 Bungkus",
+];
+const OPSI_LAINNYA = "Lainnya (isi manual)";
+
 const emptyWargaForm = {
   nama_kepala_keluarga: "",
   alamat: "",
@@ -40,7 +63,7 @@ const emptyWargaForm = {
   password: "",
 };
 
-const emptyProdukForm = { nama: "", poin_dibutuhkan: 0, stok: 0 };
+const emptyProdukForm = { preset: "", customNama: "", poin_dibutuhkan: 0, stok: 0 };
 const emptyManualForm = { rumah_tangga_id: "", jenis_sampah_id: "", berat_kg: 0 };
 
 export default function AdminPage() {
@@ -51,6 +74,8 @@ export default function AdminPage() {
   const [warga, setWarga] = useState<Warga[]>([]);
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
   const [jenisSampahList, setJenisSampahList] = useState<JenisSampah[]>([]);
+  const [produkList, setProdukList] = useState<Produk[]>([]);
+  const [editStok, setEditStok] = useState<Record<string, number>>({});
   const [wargaForm, setWargaForm] = useState(emptyWargaForm);
   const [produkForm, setProdukForm] = useState(emptyProdukForm);
   const [manualForm, setManualForm] = useState(emptyManualForm);
@@ -70,14 +95,16 @@ export default function AdminPage() {
   async function muatSemua() {
     setLoading(true);
     try {
-      const [wargaData, transaksiData, jenisSampahData] = await Promise.all([
+      const [wargaData, transaksiData, jenisSampahData, produkData] = await Promise.all([
         api.listWarga(),
         api.semuaTransaksi(),
         api.jenisSampah(),
+        api.produkTukar(),
       ]);
       setWarga(wargaData);
       setTransaksi(transaksiData);
       setJenisSampahList(jenisSampahData);
+      setProdukList(produkData);
     } catch (err) {
       setPesan(err instanceof ApiError ? err.message : "Gagal memuat data");
     } finally {
@@ -115,12 +142,49 @@ export default function AdminPage() {
   async function tambahProduk(e: React.FormEvent) {
     e.preventDefault();
     setPesan("");
+    const nama = produkForm.preset === OPSI_LAINNYA ? produkForm.customNama.trim() : produkForm.preset;
+    if (!nama) {
+      setPesan("Pilih barang dari daftar atau isi nama barang lain dulu.");
+      return;
+    }
     try {
-      await api.createProduk(produkForm);
+      await api.createProduk({
+        nama,
+        poin_dibutuhkan: produkForm.poin_dibutuhkan,
+        stok: produkForm.stok,
+      });
       setProdukForm(emptyProdukForm);
       setPesan("Produk tukar berhasil ditambahkan.");
+      muatSemua();
     } catch (err) {
       setPesan(err instanceof ApiError ? err.message : "Gagal menambah produk");
+    }
+  }
+
+  async function updateStokProduk(p: Produk) {
+    const stokBaru = editStok[p.id] ?? p.stok;
+    setPesan("");
+    try {
+      await api.updateProduk(p.id, {
+        nama: p.nama,
+        poin_dibutuhkan: p.poin_dibutuhkan,
+        stok: stokBaru,
+      });
+      setPesan(`Stok "${p.nama}" berhasil diperbarui menjadi ${stokBaru}.`);
+      muatSemua();
+    } catch (err) {
+      setPesan(err instanceof ApiError ? err.message : "Gagal memperbarui stok");
+    }
+  }
+
+  async function hapusProduk(id: string) {
+    if (!confirm("Hapus produk tukar ini?")) return;
+    try {
+      await api.deleteProduk(id);
+      setPesan("Produk berhasil dihapus.");
+      muatSemua();
+    } catch (err) {
+      setPesan(err instanceof ApiError ? err.message : "Gagal menghapus produk");
     }
   }
 
@@ -233,22 +297,78 @@ export default function AdminPage() {
         )}
 
         {tab === "produk" && (
-          <section>
-            <form onSubmit={tambahProduk} className="bg-white rounded-lg shadow p-6 grid sm:grid-cols-3 gap-3">
-              <h2 className="font-semibold sm:col-span-3">Tambah Produk Tukar</h2>
-              <input required placeholder="Nama Produk" className="border rounded px-3 py-2"
-                value={produkForm.nama}
-                onChange={(e) => setProdukForm({ ...produkForm, nama: e.target.value })} />
-              <input required type="number" placeholder="Poin Dibutuhkan" className="border rounded px-3 py-2"
+          <section className="space-y-4">
+            <form onSubmit={tambahProduk} className="bg-white rounded-lg shadow p-6 grid sm:grid-cols-2 gap-3">
+              <h2 className="font-semibold sm:col-span-2">Tambah Produk Tukar</h2>
+
+              <select required className="border rounded px-3 py-2"
+                value={produkForm.preset}
+                onChange={(e) => setProdukForm({ ...produkForm, preset: e.target.value })}>
+                <option value="">Pilih Barang</option>
+                {PRESET_PRODUK.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+                <option value={OPSI_LAINNYA}>{OPSI_LAINNYA}</option>
+              </select>
+
+              {produkForm.preset === OPSI_LAINNYA ? (
+                <input required placeholder="Nama barang lain" className="border rounded px-3 py-2"
+                  value={produkForm.customNama}
+                  onChange={(e) => setProdukForm({ ...produkForm, customNama: e.target.value })} />
+              ) : (
+                <div />
+              )}
+
+              <input required type="number" min="1" placeholder="Poin Dibutuhkan" className="border rounded px-3 py-2"
                 value={produkForm.poin_dibutuhkan || ""}
                 onChange={(e) => setProdukForm({ ...produkForm, poin_dibutuhkan: Number(e.target.value) })} />
-              <input required type="number" placeholder="Stok" className="border rounded px-3 py-2"
+              <input required type="number" min="0" placeholder="Stok Awal" className="border rounded px-3 py-2"
                 value={produkForm.stok || ""}
                 onChange={(e) => setProdukForm({ ...produkForm, stok: Number(e.target.value) })} />
-              <button className="sm:col-span-3 bg-primary text-white rounded py-2 font-medium">
+
+              <button className="sm:col-span-2 bg-primary text-white rounded py-2 font-medium">
                 Simpan Produk
               </button>
             </form>
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500 border-b bg-gray-50">
+                    <th className="py-2 px-4">Nama Barang</th>
+                    <th className="px-4">Poin Dibutuhkan</th>
+                    <th className="px-4">Stok</th>
+                    <th className="px-4"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {produkList.map((p) => (
+                    <tr key={p.id} className="border-b last:border-0">
+                      <td className="py-2 px-4">{p.nama}</td>
+                      <td className="px-4">{p.poin_dibutuhkan}</td>
+                      <td className="px-4">
+                        <input type="number" min="0" className="border rounded px-2 py-1 w-20"
+                          value={editStok[p.id] ?? p.stok}
+                          onChange={(e) =>
+                            setEditStok({ ...editStok, [p.id]: Number(e.target.value) })
+                          } />
+                      </td>
+                      <td className="px-4 whitespace-nowrap">
+                        <button onClick={() => updateStokProduk(p)} className="text-primary text-xs mr-3">
+                          Update Stok
+                        </button>
+                        <button onClick={() => hapusProduk(p.id)} className="text-red-500 text-xs">
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {produkList.length === 0 && (
+                    <tr><td colSpan={4} className="py-4 text-center text-gray-400">Belum ada produk tukar.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </section>
         )}
 
