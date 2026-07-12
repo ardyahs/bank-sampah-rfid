@@ -57,6 +57,7 @@ func (e *Env) Login(w http.ResponseWriter, r *http.Request) {
 		"token": token,
 		"user": map[string]string{
 			"id":              id,
+			"username":        req.Username,
 			"role":            role,
 			"rumah_tangga_id": rtID,
 		},

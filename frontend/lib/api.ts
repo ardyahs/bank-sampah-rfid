@@ -35,10 +35,13 @@ async function request<T>(
 
 export const api = {
   login: (username: string, password: string) =>
-    request<{ token: string; user: { id: string; role: string; rumah_tangga_id: string } }>(
-      "/api/auth/login",
-      { method: "POST", body: JSON.stringify({ username, password }) }
-    ),
+    request<{
+      token: string;
+      user: { id: string; username: string; role: string; rumah_tangga_id: string };
+    }>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    }),
 
   saldoPoin: (rumahTanggaId: string) =>
     request<{ rumah_tangga_id: string; total_poin: number }>(
@@ -88,4 +91,3 @@ export const api = {
       }),
     }),
 };
-

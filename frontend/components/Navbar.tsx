@@ -16,7 +16,7 @@ export default function Navbar({ user }: { user: SessionUser | null }) {
       <div className="font-semibold text-lg">Bank Sampah Digital RFID</div>
       {user && (
         <div className="flex items-center gap-4 text-sm">
-          <span className="opacity-90">Role: {user.role}</span>
+          <span className="opacity-90">Hai, {user.username}</span>
           <button
             onClick={logout}
             className="bg-white text-primary px-3 py-1 rounded hover:bg-gray-100"

@@ -1,5 +1,6 @@
 export type SessionUser = {
   id: string;
+  username: string;
   role: "admin" | "petugas" | "warga";
   rumah_tangga_id: string;
 };
