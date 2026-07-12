@@ -8,13 +8,15 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// Leaderboard mengembalikan ranking rumah tangga dalam satu RT berdasarkan total poin.
-// Gunakan rt = "semua" untuk melihat ranking lintas RT.
+// Leaderboard mengembalikan ranking rumah tangga dalam satu RT, diurutkan
+// berdasarkan jumlah SETOR (seberapa sering rumah tangga itu menyetor sampah),
+// bukan cuma total poin. Gunakan rt = "semua" untuk melihat ranking lintas RT.
 func (e *Env) Leaderboard(w http.ResponseWriter, r *http.Request) {
 	rt := chi.URLParam(r, "rt")
 
 	query := `
 		SELECT rt.id, rt.nama_kepala_keluarga, rt.rt,
+		       COUNT(ts.id) AS jumlah_setor,
 		       COALESCE(SUM(ts.berat_kg), 0) AS total_berat,
 		       COALESCE(sp.total_poin, 0) AS total_poin
 		FROM rumah_tangga rt
@@ -22,7 +24,7 @@ func (e *Env) Leaderboard(w http.ResponseWriter, r *http.Request) {
 		LEFT JOIN saldo_poin sp ON sp.rumah_tangga_id = rt.id
 		WHERE ($1 = 'semua' OR rt.rt = $1)
 		GROUP BY rt.id, rt.nama_kepala_keluarga, rt.rt, sp.total_poin
-		ORDER BY total_poin DESC
+		ORDER BY jumlah_setor DESC, total_poin DESC
 		LIMIT 100`
 
 	rows, err := e.DB.Query(r.Context(), query, rt)
@@ -35,7 +37,7 @@ func (e *Env) Leaderboard(w http.ResponseWriter, r *http.Request) {
 	hasil := []models.LeaderboardRow{}
 	for rows.Next() {
 		var row models.LeaderboardRow
-		if err := rows.Scan(&row.RumahTanggaID, &row.NamaKepalaKeluarga, &row.RT, &row.TotalBeratKg, &row.TotalPoin); err != nil {
+		if err := rows.Scan(&row.RumahTanggaID, &row.NamaKepalaKeluarga, &row.RT, &row.JumlahSetor, &row.TotalBeratKg, &row.TotalPoin); err != nil {
 			writeError(w, http.StatusInternalServerError, "gagal membaca data leaderboard")
 			return
 		}

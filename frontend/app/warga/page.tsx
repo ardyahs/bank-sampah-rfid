@@ -21,12 +21,23 @@ type Produk = {
   stok: number;
 };
 
+type LeaderboardRow = {
+  rumah_tangga_id: string;
+  nama_kepala_keluarga: string;
+  rt: string;
+  jumlah_setor: number;
+  total_berat_kg: number;
+  total_poin: number;
+};
+
 export default function WargaPage() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
   const [poin, setPoin] = useState<number>(0);
   const [riwayat, setRiwayat] = useState<Riwayat[]>([]);
   const [produk, setProduk] = useState<Produk[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
+  const [leaderboardRt, setLeaderboardRt] = useState("semua");
   const [pesan, setPesan] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +50,16 @@ export default function WargaPage() {
     setUser(u);
     loadData(u.rumah_tangga_id);
   }, [router]);
+
+  useEffect(() => {
+    if (!user) return;
+    api
+      .leaderboard(leaderboardRt)
+      .then(setLeaderboard)
+      .catch(() => {
+        // leaderboard cuma pelengkap, tidak perlu tampilkan error besar kalau gagal
+      });
+  }, [user, leaderboardRt]);
 
   async function loadData(rumahTanggaId: string) {
     setLoading(true);
@@ -135,6 +156,52 @@ export default function WargaPage() {
                 <tr>
                   <td colSpan={4} className="py-4 text-center text-gray-400">
                     Belum ada riwayat setor.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </section>
+
+        <section className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="font-semibold">Leaderboard — Paling Sering Menyetor</h2>
+            <input
+              className="border rounded px-2 py-1 text-xs ml-auto"
+              placeholder="Filter RT atau 'semua'"
+              value={leaderboardRt}
+              onChange={(e) => setLeaderboardRt(e.target.value || "semua")}
+            />
+          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-gray-500 border-b">
+                <th className="py-2">#</th>
+                <th>Kepala Keluarga</th>
+                <th>RT</th>
+                <th>Jumlah Setor</th>
+                <th>Total Poin</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaderboard.slice(0, 10).map((row, i) => (
+                <tr
+                  key={row.rumah_tangga_id}
+                  className={`border-b last:border-0 ${
+                    row.rumah_tangga_id === user?.rumah_tangga_id ? "bg-green-50 font-medium" : ""
+                  }`}
+                >
+                  <td className="py-2">{i + 1}</td>
+                  <td>{row.nama_kepala_keluarga}</td>
+                  <td>{row.rt}</td>
+                  <td>{row.jumlah_setor}x</td>
+                  <td>{row.total_poin.toLocaleString("id-ID")}</td>
+                </tr>
+              ))}
+              {leaderboard.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-4 text-center text-gray-400">
+                    Belum ada data.
                   </td>
                 </tr>
               )}

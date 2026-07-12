@@ -78,6 +78,7 @@ type LeaderboardRow struct {
 	RumahTanggaID      string  `json:"rumah_tangga_id"`
 	NamaKepalaKeluarga string  `json:"nama_kepala_keluarga"`
 	RT                 string  `json:"rt"`
+	JumlahSetor        int64   `json:"jumlah_setor"`
 	TotalBeratKg       float64 `json:"total_berat_kg"`
 	TotalPoin          int64   `json:"total_poin"`
 }
