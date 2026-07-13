@@ -2,7 +2,21 @@
 
 import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Recycle,
+  Users,
+  Gift,
+  PenLine,
+  BarChart3,
+  Trophy,
+  Phone,
+  Info,
+  Plus,
+  Search,
+  type LucideIcon,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
+import RankBadge from "@/components/RankBadge";
 import { getUser, SessionUser } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 
@@ -316,50 +330,53 @@ export default function AdminPage() {
   if (loading)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-        <span className="text-4xl animate-pulse" aria-hidden>♻️</span>
+        <Recycle className="w-10 h-10 text-primary animate-pulse" aria-hidden />
         <p className="text-green-700/80 text-sm">Memuat...</p>
       </div>
     );
 
-  const tabLabel: Record<string, string> = {
-    warga: "👥 Kelola Warga",
-    produk: "🎁 Produk Tukar",
-    manual: "✏️ Input Manual",
-    transaksi: "📊 Monitor Transaksi",
-    leaderboard: "🏆 Leaderboard",
-    kontak: "📞 Kontak",
-  };
+  const tabs: { key: typeof tab; label: string; icon: LucideIcon }[] = [
+    { key: "warga", label: "Kelola Warga", icon: Users },
+    { key: "produk", label: "Produk Tukar", icon: Gift },
+    { key: "manual", label: "Input Manual", icon: PenLine },
+    { key: "transaksi", label: "Monitor Transaksi", icon: BarChart3 },
+    { key: "leaderboard", label: "Leaderboard", icon: Trophy },
+    { key: "kontak", label: "Kontak", icon: Phone },
+  ];
 
   return (
     <div>
       <Navbar user={user} />
       <main className="max-w-5xl mx-auto p-5 sm:p-6 space-y-6">
         <div className="flex gap-2 flex-wrap">
-          {(["warga", "produk", "manual", "transaksi", "leaderboard", "kontak"] as const).map((t) => (
+          {tabs.map(({ key, label, icon: Icon }) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                tab === t
+              key={key}
+              onClick={() => setTab(key)}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition ${
+                tab === key
                   ? "bg-primary text-white shadow-eco-sm"
                   : "bg-white text-gray-600 border border-green-200 hover:bg-green-50"
               }`}
             >
-              {tabLabel[t]}
+              <Icon className="w-4 h-4" />
+              {label}
             </button>
           ))}
         </div>
 
         {pesan && (
           <div className="bg-green-50 border border-green-100 text-green-800 text-sm p-3 rounded-lg flex items-center gap-2">
-            <span aria-hidden>ℹ️</span> {pesan}
+            <Info className="w-4 h-4 shrink-0" aria-hidden /> {pesan}
           </div>
         )}
 
         {tab === "warga" && (
           <section className="space-y-4">
             <form onSubmit={tambahWarga} className="eco-card p-6 grid sm:grid-cols-2 gap-3">
-              <h2 className="eco-title sm:col-span-2 flex items-center gap-2">➕ Tambah Rumah Tangga</h2>
+              <h2 className="eco-title sm:col-span-2 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-primary" /> Tambah Rumah Tangga
+              </h2>
               <input required placeholder="Nama Kepala Keluarga" className="eco-input"
                 value={wargaForm.nama_kepala_keluarga}
                 onChange={(e) => setWargaForm({ ...wargaForm, nama_kepala_keluarga: e.target.value })} />
@@ -387,12 +404,15 @@ export default function AdminPage() {
               </button>
             </form>
 
-            <input
-              placeholder="🔍 Cari nama warga..."
-              className="eco-input w-full sm:w-72"
-              value={cariWarga}
-              onChange={(e) => setCariWarga(e.target.value)}
-            />
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" aria-hidden />
+              <input
+                placeholder="Cari nama warga..."
+                className="eco-input w-full pl-9"
+                value={cariWarga}
+                onChange={(e) => setCariWarga(e.target.value)}
+              />
+            </div>
 
             <div className="eco-card overflow-hidden">
               <div className="overflow-x-auto">
@@ -495,7 +515,9 @@ export default function AdminPage() {
         {tab === "produk" && (
           <section className="space-y-4">
             <form onSubmit={tambahProduk} className="eco-card p-6 grid sm:grid-cols-2 gap-3">
-              <h2 className="eco-title sm:col-span-2 flex items-center gap-2">➕ Tambah Produk Tukar</h2>
+              <h2 className="eco-title sm:col-span-2 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-primary" /> Tambah Produk Tukar
+              </h2>
 
               <select required className="eco-input"
                 value={produkForm.preset}
@@ -572,7 +594,9 @@ export default function AdminPage() {
 
         {tab === "manual" && (
           <section className="eco-card p-6">
-            <h2 className="eco-title mb-1 flex items-center gap-2">✏️ Input Transaksi Manual</h2>
+            <h2 className="eco-title mb-1 flex items-center gap-2">
+              <PenLine className="w-5 h-5 text-primary" /> Input Transaksi Manual
+            </h2>
             <p className="text-sm text-gray-500 mb-4">
               Dipakai kalau alat RFID belum siap/rusak, atau untuk mengoreksi transaksi yang terlewat.
             </p>
@@ -611,7 +635,9 @@ export default function AdminPage() {
         {tab === "transaksi" && (
           <section className="space-y-6">
             <div>
-              <h2 className="eco-title mb-2 flex items-center gap-2">📊 Riwayat Setor Sampah</h2>
+              <h2 className="eco-title mb-2 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" /> Riwayat Setor Sampah
+              </h2>
               <div className="eco-card overflow-hidden">
                 <div className="overflow-x-auto">
                 <table className="eco-table">
@@ -644,7 +670,9 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <h2 className="eco-title mb-2 flex items-center gap-2">🎁 Riwayat Penukaran Poin (Barang Diambil Warga)</h2>
+              <h2 className="eco-title mb-2 flex items-center gap-2">
+                <Gift className="w-5 h-5 text-primary" /> Riwayat Penukaran Poin (Barang Diambil Warga)
+              </h2>
               <div className="eco-card overflow-hidden">
                 <div className="overflow-x-auto">
                 <table className="eco-table">
@@ -707,11 +735,7 @@ export default function AdminPage() {
                 <tbody>
                   {leaderboard.map((row, i) => (
                     <tr key={row.rumah_tangga_id}>
-                      <td>
-                        <span className="font-semibold text-gray-700">
-                          {["🥇", "🥈", "🥉"][i] ?? i + 1}
-                        </span>
-                      </td>
+                      <td><RankBadge index={i} /></td>
                       <td className="font-medium text-gray-800">{row.nama_kepala_keluarga}</td>
                       <td>{row.rt}</td>
                       <td><span className="eco-badge">{row.jumlah_setor}x</span></td>
@@ -731,7 +755,9 @@ export default function AdminPage() {
 
         {tab === "kontak" && (
           <section className="eco-card p-6 max-w-xl">
-            <h2 className="eco-title mb-1 flex items-center gap-2">📞 Contact Center</h2>
+            <h2 className="eco-title mb-1 flex items-center gap-2">
+              <Phone className="w-5 h-5 text-primary" /> Contact Center
+            </h2>
             <p className="text-sm text-gray-500 mb-4">
               Info ini akan ditampilkan ke warga supaya tahu cara menghubungi pengelola bank sampah.
             </p>

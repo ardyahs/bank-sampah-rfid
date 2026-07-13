@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trophy } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import RankBadge from "@/components/RankBadge";
 import { getUser, SessionUser } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 
@@ -46,7 +48,7 @@ export default function LeaderboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div>
             <h1 className="eco-title text-xl flex items-center gap-2">
-              🏆 Leaderboard RT
+              <Trophy className="w-5 h-5 text-amber-400" /> Leaderboard RT
             </h1>
             <p className="text-sm text-gray-500">Rumah tangga paling rajin menyetor sampah</p>
           </div>
@@ -78,11 +80,7 @@ export default function LeaderboardPage() {
               <tbody>
                 {data.map((row, i) => (
                   <tr key={row.rumah_tangga_id}>
-                    <td>
-                      <span className="font-semibold text-gray-700">
-                        {["🥇", "🥈", "🥉"][i] ?? i + 1}
-                      </span>
-                    </td>
+                    <td><RankBadge index={i} /></td>
                     <td className="font-medium text-gray-800">{row.nama_kepala_keluarga}</td>
                     <td>{row.rt}</td>
                     <td><span className="eco-badge">{row.jumlah_setor}x setor</span></td>

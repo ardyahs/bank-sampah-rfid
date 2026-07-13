@@ -2,7 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Recycle,
+  Leaf,
+  Sprout,
+  CheckCircle2,
+  MessageCircle,
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  Gift,
+  ClipboardList,
+  Trophy,
+  ChevronRight,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
+import RankBadge from "@/components/RankBadge";
 import { getUser, SessionUser } from "@/lib/auth";
 import { api, ApiError } from "@/lib/api";
 
@@ -111,7 +128,7 @@ export default function WargaPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-        <span className="text-4xl animate-pulse" aria-hidden>♻️</span>
+        <Recycle className="w-10 h-10 text-primary animate-pulse" aria-hidden />
         <p className="text-green-700/80 text-sm">Memuat...</p>
       </div>
     );
@@ -123,21 +140,19 @@ export default function WargaPage() {
       <main className="max-w-4xl mx-auto p-5 sm:p-6 space-y-6">
         {/* Kartu saldo poin */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white p-7 shadow-eco">
-          <div className="absolute -right-6 -top-8 text-[120px] opacity-15 select-none" aria-hidden>
-            🌿
-          </div>
+          <Leaf className="absolute -right-4 -top-6 w-40 h-40 opacity-15 select-none" aria-hidden />
           <p className="text-green-50/90 text-sm">Saldo Poin Anda</p>
           <p className="text-5xl font-extrabold tracking-tight mt-1">
             {poin.toLocaleString("id-ID")}
           </p>
-          <p className="text-green-50/80 text-xs mt-2">
-            Terus setor sampahmu untuk menambah poin 🌱
+          <p className="text-green-50/80 text-xs mt-2 flex items-center gap-1.5">
+            Terus setor sampahmu untuk menambah poin <Sprout className="w-3.5 h-3.5" />
           </p>
         </div>
 
         {pesan && (
           <div className="bg-green-50 border border-green-100 text-green-800 text-sm p-3 rounded-lg flex items-center gap-2">
-            <span aria-hidden>✅</span> {pesan}
+            <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden /> {pesan}
           </div>
         )}
 
@@ -145,19 +160,17 @@ export default function WargaPage() {
           <section className="eco-card overflow-hidden">
             {/* Header dengan aksen hijau */}
             <div className="relative bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-5">
-              <div className="absolute -right-3 -bottom-4 text-7xl opacity-15 select-none" aria-hidden>
-                💬
-              </div>
+              <MessageCircle className="absolute -right-3 -bottom-5 w-28 h-28 opacity-15 select-none" aria-hidden />
               <h2 className="font-semibold text-lg flex items-center gap-2">
                 Butuh Bantuan?
               </h2>
-              <p className="text-green-50/90 text-sm mt-0.5">
-                Tim bank sampah siap membantu Anda 🌱
+              <p className="text-green-50/90 text-sm mt-0.5 flex items-center gap-1.5">
+                Tim bank sampah siap membantu Anda <Sprout className="w-3.5 h-3.5" />
               </p>
               {kontak.nama_kontak && (
                 <div className="mt-3 inline-flex items-center gap-2 bg-white/15 rounded-full pl-1 pr-3 py-1">
-                  <span className="grid place-items-center w-6 h-6 rounded-full bg-white/25 text-xs" aria-hidden>
-                    👤
+                  <span className="grid place-items-center w-6 h-6 rounded-full bg-white/25" aria-hidden>
+                    <User className="w-3.5 h-3.5" />
                   </span>
                   <span className="text-sm font-medium">{kontak.nama_kontak}</span>
                 </div>
@@ -173,14 +186,14 @@ export default function WargaPage() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 p-3.5 transition hover:bg-green-100 hover:shadow-eco-sm active:scale-[0.99]"
                 >
-                  <span className="grid place-items-center w-11 h-11 rounded-xl bg-primary text-white text-xl shadow-eco-sm" aria-hidden>
-                    💬
+                  <span className="grid place-items-center w-11 h-11 rounded-xl bg-primary text-white shadow-eco-sm" aria-hidden>
+                    <MessageCircle className="w-6 h-6" />
                   </span>
                   <span className="min-w-0">
                     <span className="block text-xs text-gray-500">Chat via WhatsApp</span>
                     <span className="block font-semibold text-primary-dark truncate">{kontak.whatsapp}</span>
                   </span>
-                  <span className="ml-auto text-primary-dark" aria-hidden>›</span>
+                  <ChevronRight className="ml-auto w-5 h-5 text-primary-dark" aria-hidden />
                 </a>
               )}
 
@@ -188,7 +201,7 @@ export default function WargaPage() {
               <div className="grid sm:grid-cols-2 gap-2.5 text-sm">
                 {kontak.telepon && (
                   <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <span className="text-lg" aria-hidden>📱</span>
+                    <Phone className="w-5 h-5 text-primary shrink-0" aria-hidden />
                     <span className="min-w-0">
                       <span className="block text-xs text-gray-500">Telepon</span>
                       <a href={`tel:${kontak.telepon}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
@@ -199,7 +212,7 @@ export default function WargaPage() {
                 )}
                 {kontak.email && (
                   <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <span className="text-lg" aria-hidden>✉️</span>
+                    <Mail className="w-5 h-5 text-primary shrink-0" aria-hidden />
                     <span className="min-w-0">
                       <span className="block text-xs text-gray-500">Email</span>
                       <a href={`mailto:${kontak.email}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
@@ -210,7 +223,7 @@ export default function WargaPage() {
                 )}
                 {kontak.alamat && (
                   <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <span className="text-lg" aria-hidden>📍</span>
+                    <MapPin className="w-5 h-5 text-primary shrink-0" aria-hidden />
                     <span className="min-w-0">
                       <span className="block text-xs text-gray-500">Alamat</span>
                       <span className="font-medium text-gray-800">{kontak.alamat}</span>
@@ -219,7 +232,7 @@ export default function WargaPage() {
                 )}
                 {kontak.jam_operasional && (
                   <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <span className="text-lg" aria-hidden>🕐</span>
+                    <Clock className="w-5 h-5 text-primary shrink-0" aria-hidden />
                     <span className="min-w-0">
                       <span className="block text-xs text-gray-500">Jam Operasional</span>
                       <span className="font-medium text-gray-800">{kontak.jam_operasional}</span>
@@ -232,7 +245,9 @@ export default function WargaPage() {
         )}
 
         <section className="eco-card p-6">
-          <h2 className="eco-title mb-4 flex items-center gap-2">🎁 Tukar Poin</h2>
+          <h2 className="eco-title mb-4 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-primary" /> Tukar Poin
+          </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {produk.map((p) => {
               const kurang = poin < p.poin_dibutuhkan;
@@ -266,7 +281,9 @@ export default function WargaPage() {
         </section>
 
         <section className="eco-card p-6">
-          <h2 className="eco-title mb-4 flex items-center gap-2">📋 Riwayat Setor Sampah</h2>
+          <h2 className="eco-title mb-4 flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-primary" /> Riwayat Setor Sampah
+          </h2>
           <div className="overflow-x-auto">
             <table className="eco-table">
               <thead>
@@ -300,7 +317,9 @@ export default function WargaPage() {
 
         <section className="eco-card p-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-            <h2 className="eco-title flex items-center gap-2">🏆 Leaderboard — Paling Sering Menyetor</h2>
+            <h2 className="eco-title flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-amber-400" /> Leaderboard — Paling Sering Menyetor
+            </h2>
             <input
               className="eco-input text-xs sm:ml-auto sm:w-44"
               placeholder="Filter RT atau 'semua'"
@@ -324,11 +343,7 @@ export default function WargaPage() {
                   const isSaya = row.rumah_tangga_id === user?.rumah_tangga_id;
                   return (
                     <tr key={row.rumah_tangga_id} className={isSaya ? "bg-green-100/70 font-medium" : ""}>
-                      <td>
-                        <span className="font-semibold text-gray-700">
-                          {["🥇", "🥈", "🥉"][i] ?? i + 1}
-                        </span>
-                      </td>
+                      <td><RankBadge index={i} /></td>
                       <td>
                         {row.nama_kepala_keluarga}
                         {isSaya && <span className="eco-badge ml-2">Anda</span>}

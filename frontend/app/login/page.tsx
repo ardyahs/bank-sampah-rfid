@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Recycle, Sprout, Globe2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { saveSession } from "@/lib/auth";
 
@@ -35,8 +36,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <span className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-primary text-white text-3xl shadow-eco mb-3">
-            ♻️
+          <span className="inline-grid place-items-center w-16 h-16 rounded-2xl bg-primary text-white shadow-eco mb-3">
+            <Recycle className="w-8 h-8" />
           </span>
           <h1 className="text-2xl font-bold text-forest">Bank Sampah Digital</h1>
           <p className="text-sm text-green-700/70 mt-1">
@@ -49,7 +50,9 @@ export default function LoginPage() {
           className="eco-card p-7 sm:p-8"
         >
           <h2 className="text-lg font-semibold text-forest mb-1">Masuk ke akun Anda</h2>
-          <p className="text-sm text-gray-500 mb-6">Selamat datang kembali 🌱</p>
+          <p className="text-sm text-gray-500 mb-6 flex items-center gap-1.5">
+            Selamat datang kembali <Sprout className="w-4 h-4 text-primary" />
+          </p>
 
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-600 text-sm p-3 rounded-lg mb-4">
@@ -79,8 +82,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-xs text-green-700/60 mt-5">
-          🌍 Bersama menjaga bumi untuk generasi mendatang
+        <p className="text-center text-xs text-green-700/60 mt-5 flex items-center justify-center gap-1.5">
+          <Globe2 className="w-3.5 h-3.5" />
+          Bersama menjaga bumi untuk generasi mendatang
         </p>
       </div>
     </div>

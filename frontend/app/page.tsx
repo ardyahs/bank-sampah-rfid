@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Recycle } from "lucide-react";
 import { getUser } from "@/lib/auth";
 
 export default function Home() {
@@ -20,7 +21,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-      <span className="text-4xl animate-pulse" aria-hidden>♻️</span>
+      <Recycle className="w-10 h-10 text-primary animate-pulse" aria-hidden />
       <p className="text-green-700/80 text-sm">Memuat...</p>
     </div>
   );

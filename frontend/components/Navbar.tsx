@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Recycle, LogOut } from "lucide-react";
 import { clearSession, SessionUser } from "@/lib/auth";
 
 export default function Navbar({ user }: { user: SessionUser | null }) {
@@ -15,8 +16,8 @@ export default function Navbar({ user }: { user: SessionUser | null }) {
     <nav className="sticky top-0 z-20 bg-primary/95 backdrop-blur text-white shadow-eco">
       <div className="max-w-5xl mx-auto px-5 sm:px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/20 text-lg" aria-hidden>
-            ♻️
+          <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/20" aria-hidden>
+            <Recycle className="w-5 h-5" />
           </span>
           <div className="leading-tight">
             <div className="font-semibold text-[15px]">Bank Sampah Digital</div>
@@ -31,8 +32,9 @@ export default function Navbar({ user }: { user: SessionUser | null }) {
             </span>
             <button
               onClick={logout}
-              className="bg-white/95 text-primary-dark font-medium px-3.5 py-1.5 rounded-lg hover:bg-white transition active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 bg-white/95 text-primary-dark font-medium px-3.5 py-1.5 rounded-lg hover:bg-white transition active:scale-[0.98]"
             >
+              <LogOut className="w-4 h-4" />
               Keluar
             </button>
           </div>
