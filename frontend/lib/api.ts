@@ -63,6 +63,16 @@ export const api = {
 
   jenisSampah: () => request<any[]>("/api/jenis-sampah"),
 
+  getKontak: () =>
+    request<{
+      nama_kontak: string;
+      whatsapp: string;
+      telepon: string;
+      email: string;
+      alamat: string;
+      jam_operasional: string;
+    }>("/api/kontak"),
+
   // Admin
   listWarga: () => request<any[]>("/api/admin/warga"),
   createWarga: (payload: any) =>
@@ -97,5 +107,18 @@ export const api = {
         jenis_sampah_id: jenisSampahId,
         berat_kg: beratKg,
       }),
+    }),
+
+  updateKontak: (payload: {
+    nama_kontak: string;
+    whatsapp: string;
+    telepon: string;
+    email: string;
+    alamat: string;
+    jam_operasional: string;
+  }) =>
+    request<any>("/api/admin/kontak", {
+      method: "PUT",
+      body: JSON.stringify(payload),
     }),
 };

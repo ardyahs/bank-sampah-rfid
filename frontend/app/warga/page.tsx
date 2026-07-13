@@ -30,6 +30,15 @@ type LeaderboardRow = {
   total_poin: number;
 };
 
+type Kontak = {
+  nama_kontak: string;
+  whatsapp: string;
+  telepon: string;
+  email: string;
+  alamat: string;
+  jam_operasional: string;
+};
+
 export default function WargaPage() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -38,6 +47,7 @@ export default function WargaPage() {
   const [produk, setProduk] = useState<Produk[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [leaderboardRt, setLeaderboardRt] = useState("semua");
+  const [kontak, setKontak] = useState<Kontak | null>(null);
   const [pesan, setPesan] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -60,6 +70,13 @@ export default function WargaPage() {
         // leaderboard cuma pelengkap, tidak perlu tampilkan error besar kalau gagal
       });
   }, [user, leaderboardRt]);
+
+  useEffect(() => {
+    if (!user) return;
+    api.getKontak().then(setKontak).catch(() => {
+      // kontak cuma info tambahan, tidak perlu tampilkan error kalau gagal
+    });
+  }, [user]);
 
   async function loadData(rumahTanggaId: string) {
     setLoading(true);
@@ -106,6 +123,34 @@ export default function WargaPage() {
 
         {pesan && (
           <div className="bg-blue-50 text-blue-700 text-sm p-3 rounded">{pesan}</div>
+        )}
+
+        {kontak && (kontak.whatsapp || kontak.telepon || kontak.email || kontak.alamat) && (
+          <section className="bg-white rounded-lg shadow p-6">
+            <h2 className="font-semibold mb-3">Butuh Bantuan? Hubungi Kami</h2>
+            <div className="text-sm text-gray-700 space-y-1">
+              {kontak.nama_kontak && <p className="font-medium">{kontak.nama_kontak}</p>}
+              {kontak.whatsapp && (
+                <p>
+                  WhatsApp:{" "}
+                  <a
+                    href={`https://wa.me/${kontak.whatsapp}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline"
+                  >
+                    {kontak.whatsapp}
+                  </a>
+                </p>
+              )}
+              {kontak.telepon && <p>Telepon: {kontak.telepon}</p>}
+              {kontak.email && <p>Email: {kontak.email}</p>}
+              {kontak.alamat && <p>Alamat: {kontak.alamat}</p>}
+              {kontak.jam_operasional && (
+                <p className="text-gray-500">Jam operasional: {kontak.jam_operasional}</p>
+              )}
+            </div>
+          </section>
         )}
 
         <section className="bg-white rounded-lg shadow p-6">

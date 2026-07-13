@@ -74,6 +74,15 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+type PengaturanKontak struct {
+	NamaKontak     string `json:"nama_kontak"`
+	Whatsapp       string `json:"whatsapp"`
+	Telepon        string `json:"telepon"`
+	Email          string `json:"email"`
+	Alamat         string `json:"alamat"`
+	JamOperasional string `json:"jam_operasional"`
+}
+
 type LeaderboardRow struct {
 	RumahTanggaID      string  `json:"rumah_tangga_id"`
 	NamaKepalaKeluarga string  `json:"nama_kepala_keluarga"`

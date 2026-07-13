@@ -73,6 +73,7 @@ func main() {
 			r.Get("/produk-tukar", env.ListProdukTukar)
 			r.Get("/leaderboard/{rt}", env.Leaderboard)
 			r.Get("/jenis-sampah", env.ListJenisSampah)
+			r.Get("/kontak", env.GetKontak)
 
 			// Hanya admin
 			r.Group(func(r chi.Router) {
@@ -91,6 +92,7 @@ func main() {
 				r.Get("/admin/transaksi", env.ListSemuaTransaksi)
 				r.Get("/admin/transaksi-tukar", env.ListSemuaTransaksiTukar)
 				r.Post("/admin/setor-manual", env.ManualSetor)
+				r.Put("/admin/kontak", env.UpdateKontak)
 			})
 		})
 	})

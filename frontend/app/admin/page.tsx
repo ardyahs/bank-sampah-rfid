@@ -87,7 +87,7 @@ const emptyManualForm = { rumah_tangga_id: "", jenis_sampah_id: "", berat_kg: 0 
 export default function AdminPage() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [tab, setTab] = useState<"warga" | "produk" | "transaksi" | "manual" | "leaderboard">("warga");
+  const [tab, setTab] = useState<"warga" | "produk" | "transaksi" | "manual" | "leaderboard" | "kontak">("warga");
 
   const [warga, setWarga] = useState<Warga[]>([]);
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
@@ -107,6 +107,14 @@ export default function AdminPage() {
   const [editKartuUid, setEditKartuUid] = useState("");
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
+  const [kontakForm, setKontakForm] = useState({
+    nama_kontak: "",
+    whatsapp: "",
+    telepon: "",
+    email: "",
+    alamat: "",
+    jam_operasional: "",
+  });
 
   useEffect(() => {
     const u = getUser();
@@ -125,6 +133,14 @@ export default function AdminPage() {
       .then(setLeaderboard)
       .catch((err) => setPesan(err instanceof ApiError ? err.message : "Gagal memuat leaderboard"));
   }, [user, tab, leaderboardRt]);
+
+  useEffect(() => {
+    if (!user || tab !== "kontak") return;
+    api
+      .getKontak()
+      .then(setKontakForm)
+      .catch((err) => setPesan(err instanceof ApiError ? err.message : "Gagal memuat kontak"));
+  }, [user, tab]);
 
   async function muatSemua() {
     setLoading(true);
@@ -286,6 +302,17 @@ export default function AdminPage() {
     }
   }
 
+  async function simpanKontak(e: React.FormEvent) {
+    e.preventDefault();
+    setPesan("");
+    try {
+      await api.updateKontak(kontakForm);
+      setPesan("Info kontak berhasil disimpan.");
+    } catch (err) {
+      setPesan(err instanceof ApiError ? err.message : "Gagal menyimpan kontak");
+    }
+  }
+
   if (loading) return <p className="p-6">Memuat...</p>;
 
   return (
@@ -293,7 +320,7 @@ export default function AdminPage() {
       <Navbar user={user} />
       <main className="max-w-5xl mx-auto p-6 space-y-6">
         <div className="flex gap-2 flex-wrap">
-          {(["warga", "produk", "manual", "transaksi", "leaderboard"] as const).map((t) => (
+          {(["warga", "produk", "manual", "transaksi", "leaderboard", "kontak"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -309,6 +336,8 @@ export default function AdminPage() {
                 ? "Input Manual"
                 : t === "leaderboard"
                 ? "Leaderboard"
+                : t === "kontak"
+                ? "Kontak"
                 : "Monitor Transaksi"}
             </button>
           ))}
@@ -672,6 +701,56 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+        )}
+
+        {tab === "kontak" && (
+          <section className="bg-white rounded-lg shadow p-6 max-w-xl">
+            <h2 className="font-semibold mb-1">Contact Center</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Info ini akan ditampilkan ke warga supaya tahu cara menghubungi pengelola bank sampah.
+            </p>
+            <form onSubmit={simpanKontak} className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Nama Kontak/Petugas</label>
+                <input className="border rounded px-3 py-2 w-full"
+                  value={kontakForm.nama_kontak}
+                  onChange={(e) => setKontakForm({ ...kontakForm, nama_kontak: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Nomor WhatsApp</label>
+                <input placeholder="mis. 6281234567890 (pakai kode negara, tanpa +)" className="border rounded px-3 py-2 w-full"
+                  value={kontakForm.whatsapp}
+                  onChange={(e) => setKontakForm({ ...kontakForm, whatsapp: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Nomor Telepon (opsional)</label>
+                <input className="border rounded px-3 py-2 w-full"
+                  value={kontakForm.telepon}
+                  onChange={(e) => setKontakForm({ ...kontakForm, telepon: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Email (opsional)</label>
+                <input className="border rounded px-3 py-2 w-full"
+                  value={kontakForm.email}
+                  onChange={(e) => setKontakForm({ ...kontakForm, email: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Alamat</label>
+                <textarea className="border rounded px-3 py-2 w-full" rows={2}
+                  value={kontakForm.alamat}
+                  onChange={(e) => setKontakForm({ ...kontakForm, alamat: e.target.value })} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Jam Operasional</label>
+                <input placeholder="mis. Senin-Sabtu, 08.00-16.00" className="border rounded px-3 py-2 w-full"
+                  value={kontakForm.jam_operasional}
+                  onChange={(e) => setKontakForm({ ...kontakForm, jam_operasional: e.target.value })} />
+              </div>
+              <button className="bg-primary text-white rounded py-2 px-4 font-medium">
+                Simpan Kontak
+              </button>
+            </form>
           </section>
         )}
       </main>
