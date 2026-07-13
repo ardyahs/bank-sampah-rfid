@@ -87,6 +87,8 @@ export const api = {
 
   semuaTransaksi: () => request<any[]>("/api/admin/transaksi"),
 
+  semuaTransaksiTukar: () => request<any[]>("/api/admin/transaksi-tukar"),
+
   setorManual: (rumahTanggaId: string, jenisSampahId: string, beratKg: number) =>
     request<any>("/api/admin/setor-manual", {
       method: "POST",

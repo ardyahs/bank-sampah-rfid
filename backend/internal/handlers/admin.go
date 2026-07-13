@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"bank-sampah-rfid/internal/models"
 
@@ -306,6 +307,48 @@ func (e *Env) ListSemuaTransaksi(w http.ResponseWriter, r *http.Request) {
 		d.BeratKg = t.BeratKg
 		d.PoinDidapat = t.PoinDidapat
 		d.CreatedAt = t.CreatedAt.Format("2006-01-02 15:04:05")
+		daftar = append(daftar, d)
+	}
+	writeJSON(w, http.StatusOK, daftar)
+}
+
+// ListSemuaTransaksiTukar mengembalikan riwayat penukaran poin (barang yang
+// sudah diambil warga) dari semua rumah tangga, untuk dipantau admin.
+func (e *Env) ListSemuaTransaksiTukar(w http.ResponseWriter, r *http.Request) {
+	rows, err := e.DB.Query(r.Context(), `
+		SELECT tt.id, tt.rumah_tangga_id, rt.nama_kepala_keluarga, tt.produk_id, pt.nama,
+		       tt.poin_terpakai, tt.status, tt.created_at
+		FROM transaksi_tukar tt
+		JOIN rumah_tangga rt ON rt.id = tt.rumah_tangga_id
+		JOIN produk_tukar pt ON pt.id = tt.produk_id
+		ORDER BY tt.created_at DESC
+		LIMIT 500`)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "gagal mengambil data penukaran")
+		return
+	}
+	defer rows.Close()
+
+	type tukarRow struct {
+		ID                 string `json:"id"`
+		RumahTanggaID      string `json:"rumah_tangga_id"`
+		NamaKepalaKeluarga string `json:"nama_kepala_keluarga"`
+		ProdukID           string `json:"produk_id"`
+		ProdukNama         string `json:"produk_nama"`
+		PoinTerpakai       int    `json:"poin_terpakai"`
+		Status             string `json:"status"`
+		CreatedAt          string `json:"created_at"`
+	}
+
+	daftar := []tukarRow{}
+	for rows.Next() {
+		var d tukarRow
+		var createdAt time.Time
+		if err := rows.Scan(&d.ID, &d.RumahTanggaID, &d.NamaKepalaKeluarga, &d.ProdukID, &d.ProdukNama, &d.PoinTerpakai, &d.Status, &createdAt); err != nil {
+			writeError(w, http.StatusInternalServerError, "gagal membaca data penukaran")
+			return
+		}
+		d.CreatedAt = createdAt.Format("2006-01-02 15:04:05")
 		daftar = append(daftar, d)
 	}
 	writeJSON(w, http.StatusOK, daftar)

@@ -24,6 +24,15 @@ type Transaksi = {
   created_at: string;
 };
 
+type TransaksiTukar = {
+  id: string;
+  nama_kepala_keluarga: string;
+  produk_nama: string;
+  poin_terpakai: number;
+  status: string;
+  created_at: string;
+};
+
 type JenisSampah = {
   id: string;
   nama: string;
@@ -82,6 +91,7 @@ export default function AdminPage() {
 
   const [warga, setWarga] = useState<Warga[]>([]);
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
+  const [transaksiTukar, setTransaksiTukar] = useState<TransaksiTukar[]>([]);
   const [jenisSampahList, setJenisSampahList] = useState<JenisSampah[]>([]);
   const [produkList, setProdukList] = useState<Produk[]>([]);
   const [editStok, setEditStok] = useState<Record<string, number>>({});
@@ -119,14 +129,16 @@ export default function AdminPage() {
   async function muatSemua() {
     setLoading(true);
     try {
-      const [wargaData, transaksiData, jenisSampahData, produkData] = await Promise.all([
+      const [wargaData, transaksiData, transaksiTukarData, jenisSampahData, produkData] = await Promise.all([
         api.listWarga(),
         api.semuaTransaksi(),
+        api.semuaTransaksiTukar(),
         api.jenisSampah(),
         api.produkTukar(),
       ]);
       setWarga(wargaData);
       setTransaksi(transaksiData);
+      setTransaksiTukar(transaksiTukarData);
       setJenisSampahList(jenisSampahData);
       setProdukList(produkData);
     } catch (err) {
@@ -553,32 +565,68 @@ export default function AdminPage() {
         )}
 
         {tab === "transaksi" && (
-          <section className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-gray-500 border-b bg-gray-50">
-                  <th className="py-2 px-4">Tanggal</th>
-                  <th className="px-4">Rumah Tangga</th>
-                  <th className="px-4">Jenis</th>
-                  <th className="px-4">Berat (kg)</th>
-                  <th className="px-4">Poin</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transaksi.map((t) => (
-                  <tr key={t.id} className="border-b last:border-0">
-                    <td className="py-2 px-4">{t.created_at}</td>
-                    <td className="px-4">{t.nama_kepala_keluarga}</td>
-                    <td className="px-4">{t.jenis_sampah_nama}</td>
-                    <td className="px-4">{t.berat_kg}</td>
-                    <td className="px-4">{t.poin_didapat}</td>
-                  </tr>
-                ))}
-                {transaksi.length === 0 && (
-                  <tr><td colSpan={5} className="py-4 text-center text-gray-400">Belum ada transaksi.</td></tr>
-                )}
-              </tbody>
-            </table>
+          <section className="space-y-6">
+            <div>
+              <h2 className="font-semibold mb-2">Riwayat Setor Sampah</h2>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b bg-gray-50">
+                      <th className="py-2 px-4">Tanggal</th>
+                      <th className="px-4">Rumah Tangga</th>
+                      <th className="px-4">Jenis</th>
+                      <th className="px-4">Berat (kg)</th>
+                      <th className="px-4">Poin</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transaksi.map((t) => (
+                      <tr key={t.id} className="border-b last:border-0">
+                        <td className="py-2 px-4">{t.created_at}</td>
+                        <td className="px-4">{t.nama_kepala_keluarga}</td>
+                        <td className="px-4">{t.jenis_sampah_nama}</td>
+                        <td className="px-4">{t.berat_kg}</td>
+                        <td className="px-4">{t.poin_didapat}</td>
+                      </tr>
+                    ))}
+                    {transaksi.length === 0 && (
+                      <tr><td colSpan={5} className="py-4 text-center text-gray-400">Belum ada transaksi.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-semibold mb-2">Riwayat Penukaran Poin (Barang Diambil Warga)</h2>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 border-b bg-gray-50">
+                      <th className="py-2 px-4">Tanggal</th>
+                      <th className="px-4">Rumah Tangga</th>
+                      <th className="px-4">Barang</th>
+                      <th className="px-4">Poin Terpakai</th>
+                      <th className="px-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transaksiTukar.map((t) => (
+                      <tr key={t.id} className="border-b last:border-0">
+                        <td className="py-2 px-4">{t.created_at}</td>
+                        <td className="px-4">{t.nama_kepala_keluarga}</td>
+                        <td className="px-4">{t.produk_nama}</td>
+                        <td className="px-4">{t.poin_terpakai}</td>
+                        <td className="px-4 capitalize">{t.status}</td>
+                      </tr>
+                    ))}
+                    {transaksiTukar.length === 0 && (
+                      <tr><td colSpan={5} className="py-4 text-center text-gray-400">Belum ada penukaran.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </section>
         )}
 
