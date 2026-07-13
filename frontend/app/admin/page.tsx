@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Recycle,
   Users,
+  UserPlus,
   Gift,
   PenLine,
   BarChart3,
@@ -101,7 +102,9 @@ const emptyManualForm = { rumah_tangga_id: "", jenis_sampah_id: "", berat_kg: 0 
 export default function AdminPage() {
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [tab, setTab] = useState<"warga" | "produk" | "transaksi" | "manual" | "leaderboard" | "kontak">("warga");
+  const [tab, setTab] = useState<
+    "warga" | "tambah-warga" | "produk" | "transaksi" | "manual" | "leaderboard" | "kontak"
+  >("warga");
 
   const [warga, setWarga] = useState<Warga[]>([]);
   const [transaksi, setTransaksi] = useState<Transaksi[]>([]);
@@ -189,6 +192,7 @@ export default function AdminPage() {
       });
       setWargaForm(emptyWargaForm);
       setPesan("Rumah tangga berhasil ditambahkan.");
+      setTab("warga");
       muatSemua();
     } catch (err) {
       setPesan(err instanceof ApiError ? err.message : "Gagal menambah rumah tangga");
@@ -337,6 +341,7 @@ export default function AdminPage() {
 
   const tabs: { key: typeof tab; label: string; icon: LucideIcon }[] = [
     { key: "warga", label: "Kelola Warga", icon: Users },
+    { key: "tambah-warga", label: "Tambah Warga", icon: UserPlus },
     { key: "produk", label: "Produk Tukar", icon: Gift },
     { key: "manual", label: "Input Manual", icon: PenLine },
     { key: "transaksi", label: "Monitor Transaksi", icon: BarChart3 },
@@ -371,12 +376,17 @@ export default function AdminPage() {
           </div>
         )}
 
-        {tab === "warga" && (
-          <section className="space-y-4">
+        {tab === "tambah-warga" && (
+          <section className="max-w-2xl">
             <form onSubmit={tambahWarga} className="eco-card p-6 grid sm:grid-cols-2 gap-3">
-              <h2 className="eco-title sm:col-span-2 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-primary" /> Tambah Rumah Tangga
-              </h2>
+              <div className="sm:col-span-2">
+                <h2 className="eco-title flex items-center gap-2">
+                  <UserPlus className="w-5 h-5 text-primary" /> Tambah Rumah Tangga
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Daftarkan rumah tangga baru beserta kartu RFID-nya. Data akan muncul di tab Kelola Warga.
+                </p>
+              </div>
               <input required placeholder="Nama Kepala Keluarga" className="eco-input"
                 value={wargaForm.nama_kepala_keluarga}
                 onChange={(e) => setWargaForm({ ...wargaForm, nama_kepala_keluarga: e.target.value })} />
@@ -403,15 +413,27 @@ export default function AdminPage() {
                 Simpan
               </button>
             </form>
+          </section>
+        )}
 
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" aria-hidden />
-              <input
-                placeholder="Cari nama warga..."
-                className="eco-input w-full pl-9"
-                value={cariWarga}
-                onChange={(e) => setCariWarga(e.target.value)}
-              />
+        {tab === "warga" && (
+          <section className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" aria-hidden />
+                <input
+                  placeholder="Cari nama warga..."
+                  className="eco-input w-full pl-9"
+                  value={cariWarga}
+                  onChange={(e) => setCariWarga(e.target.value)}
+                />
+              </div>
+              <button
+                onClick={() => setTab("tambah-warga")}
+                className="eco-btn-primary py-2 px-4 sm:ml-auto"
+              >
+                <UserPlus className="w-4 h-4" /> Tambah Warga
+              </button>
             </div>
 
             <div className="eco-card overflow-hidden">
