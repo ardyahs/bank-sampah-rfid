@@ -142,29 +142,91 @@ export default function WargaPage() {
         )}
 
         {kontak && (kontak.whatsapp || kontak.telepon || kontak.email || kontak.alamat) && (
-          <section className="eco-card p-6">
-            <h2 className="eco-title mb-3 flex items-center gap-2">📞 Butuh Bantuan? Hubungi Kami</h2>
-            <div className="text-sm text-gray-700 space-y-1">
-              {kontak.nama_kontak && <p className="font-medium text-gray-800">{kontak.nama_kontak}</p>}
+          <section className="eco-card overflow-hidden">
+            {/* Header dengan aksen hijau */}
+            <div className="relative bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-5">
+              <div className="absolute -right-3 -bottom-4 text-7xl opacity-15 select-none" aria-hidden>
+                💬
+              </div>
+              <h2 className="font-semibold text-lg flex items-center gap-2">
+                Butuh Bantuan?
+              </h2>
+              <p className="text-green-50/90 text-sm mt-0.5">
+                Tim bank sampah siap membantu Anda 🌱
+              </p>
+              {kontak.nama_kontak && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-white/15 rounded-full pl-1 pr-3 py-1">
+                  <span className="grid place-items-center w-6 h-6 rounded-full bg-white/25 text-xs" aria-hidden>
+                    👤
+                  </span>
+                  <span className="text-sm font-medium">{kontak.nama_kontak}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Tombol WhatsApp utama */}
               {kontak.whatsapp && (
-                <p>
-                  WhatsApp:{" "}
-                  <a
-                    href={`https://wa.me/${kontak.whatsapp}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary font-medium underline underline-offset-2 hover:text-primary-dark"
-                  >
-                    {kontak.whatsapp}
-                  </a>
-                </p>
+                <a
+                  href={`https://wa.me/${kontak.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 p-3.5 transition hover:bg-green-100 hover:shadow-eco-sm active:scale-[0.99]"
+                >
+                  <span className="grid place-items-center w-11 h-11 rounded-xl bg-primary text-white text-xl shadow-eco-sm" aria-hidden>
+                    💬
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs text-gray-500">Chat via WhatsApp</span>
+                    <span className="block font-semibold text-primary-dark truncate">{kontak.whatsapp}</span>
+                  </span>
+                  <span className="ml-auto text-primary-dark" aria-hidden>›</span>
+                </a>
               )}
-              {kontak.telepon && <p>Telepon: {kontak.telepon}</p>}
-              {kontak.email && <p>Email: {kontak.email}</p>}
-              {kontak.alamat && <p>Alamat: {kontak.alamat}</p>}
-              {kontak.jam_operasional && (
-                <p className="text-gray-500">Jam operasional: {kontak.jam_operasional}</p>
-              )}
+
+              {/* Detail kontak lain */}
+              <div className="grid sm:grid-cols-2 gap-2.5 text-sm">
+                {kontak.telepon && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <span className="text-lg" aria-hidden>📱</span>
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Telepon</span>
+                      <a href={`tel:${kontak.telepon}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
+                        {kontak.telepon}
+                      </a>
+                    </span>
+                  </div>
+                )}
+                {kontak.email && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <span className="text-lg" aria-hidden>✉️</span>
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Email</span>
+                      <a href={`mailto:${kontak.email}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
+                        {kontak.email}
+                      </a>
+                    </span>
+                  </div>
+                )}
+                {kontak.alamat && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <span className="text-lg" aria-hidden>📍</span>
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Alamat</span>
+                      <span className="font-medium text-gray-800">{kontak.alamat}</span>
+                    </span>
+                  </div>
+                )}
+                {kontak.jam_operasional && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <span className="text-lg" aria-hidden>🕐</span>
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Jam Operasional</span>
+                      <span className="font-medium text-gray-800">{kontak.jam_operasional}</span>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         )}
