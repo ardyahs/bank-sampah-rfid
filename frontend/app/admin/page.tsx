@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { getUser, SessionUser } from "@/lib/auth";
@@ -92,6 +92,11 @@ export default function AdminPage() {
   const [manualForm, setManualForm] = useState(emptyManualForm);
   const [pesan, setPesan] = useState("");
   const [loading, setLoading] = useState(true);
+  const [cariWarga, setCariWarga] = useState("");
+  const [editingWargaId, setEditingWargaId] = useState<string | null>(null);
+  const [editKartuUid, setEditKartuUid] = useState("");
+  const [editUsername, setEditUsername] = useState("");
+  const [editPassword, setEditPassword] = useState("");
 
   useEffect(() => {
     const u = getUser();
@@ -155,6 +160,51 @@ export default function AdminPage() {
       muatSemua();
     } catch (err) {
       setPesan(err instanceof ApiError ? err.message : "Gagal menghapus");
+    }
+  }
+
+  function mulaiEditWarga(w: Warga) {
+    setEditingWargaId(w.id);
+    setEditKartuUid(w.kartu_uid);
+    setEditUsername("");
+    setEditPassword("");
+    setPesan("");
+  }
+
+  function batalEditWarga() {
+    setEditingWargaId(null);
+  }
+
+  async function simpanKartuUid(w: Warga) {
+    setPesan("");
+    try {
+      await api.updateWarga(w.id, {
+        nama_kepala_keluarga: w.nama_kepala_keluarga,
+        alamat: w.alamat,
+        rt: w.rt,
+        rw: w.rw,
+        kartu_uid: editKartuUid,
+      });
+      setPesan(`UID kartu ${w.nama_kepala_keluarga} berhasil diperbarui.`);
+      muatSemua();
+    } catch (err) {
+      setPesan(err instanceof ApiError ? err.message : "Gagal memperbarui UID kartu");
+    }
+  }
+
+  async function simpanPasswordWarga(w: Warga) {
+    if (!editUsername || !editPassword) {
+      setPesan("Isi username dan password baru dulu.");
+      return;
+    }
+    setPesan("");
+    try {
+      await api.setPasswordWarga(w.id, editUsername, editPassword);
+      setPesan(`Akun login ${w.nama_kepala_keluarga} berhasil diperbarui.`);
+      setEditUsername("");
+      setEditPassword("");
+    } catch (err) {
+      setPesan(err instanceof ApiError ? err.message : "Gagal memperbarui akun warga");
     }
   }
 
@@ -285,6 +335,13 @@ export default function AdminPage() {
               </button>
             </form>
 
+            <input
+              placeholder="Cari nama warga..."
+              className="border rounded px-3 py-2 w-full sm:w-72"
+              value={cariWarga}
+              onChange={(e) => setCariWarga(e.target.value)}
+            />
+
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
@@ -296,18 +353,82 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {warga.map((w) => (
-                    <tr key={w.id} className="border-b last:border-0">
-                      <td className="py-2 px-4">{w.nama_kepala_keluarga}</td>
-                      <td className="px-4">{w.rt}/{w.rw}</td>
-                      <td className="px-4 font-mono text-xs">{w.kartu_uid}</td>
-                      <td className="px-4">
-                        <button onClick={() => hapusWarga(w.id)} className="text-red-500 text-xs">
-                          Hapus
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {warga
+                    .filter((w) =>
+                      w.nama_kepala_keluarga.toLowerCase().includes(cariWarga.toLowerCase())
+                    )
+                    .map((w) => (
+                      <Fragment key={w.id}>
+                        <tr className="border-b last:border-0">
+                          <td className="py-2 px-4">{w.nama_kepala_keluarga}</td>
+                          <td className="px-4">{w.rt}/{w.rw}</td>
+                          <td className="px-4 font-mono text-xs">{w.kartu_uid}</td>
+                          <td className="px-4 whitespace-nowrap">
+                            <button
+                              onClick={() =>
+                                editingWargaId === w.id ? batalEditWarga() : mulaiEditWarga(w)
+                              }
+                              className="text-primary text-xs mr-3"
+                            >
+                              {editingWargaId === w.id ? "Tutup" : "Edit"}
+                            </button>
+                            <button onClick={() => hapusWarga(w.id)} className="text-red-500 text-xs">
+                              Hapus
+                            </button>
+                          </td>
+                        </tr>
+                        {editingWargaId === w.id && (
+                          <tr key={`${w.id}-edit`} className="border-b last:border-0 bg-gray-50">
+                            <td colSpan={4} className="px-4 py-4">
+                              <div className="grid sm:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                  <p className="text-xs font-medium text-gray-500">
+                                    Ganti UID Kartu (kartu hilang/rusak)
+                                  </p>
+                                  <input
+                                    className="border rounded px-3 py-2 w-full"
+                                    value={editKartuUid}
+                                    onChange={(e) => setEditKartuUid(e.target.value)}
+                                  />
+                                  <button
+                                    onClick={() => simpanKartuUid(w)}
+                                    className="bg-primary text-white text-xs rounded px-3 py-1.5"
+                                  >
+                                    Simpan UID Kartu
+                                  </button>
+                                </div>
+                                <div className="sm:col-span-2 space-y-2">
+                                  <p className="text-xs font-medium text-gray-500">
+                                    Buat/Ganti Password Login Warga
+                                  </p>
+                                  <div className="flex flex-col sm:flex-row gap-2">
+                                    <input
+                                      placeholder="Username baru"
+                                      className="border rounded px-3 py-2 w-full"
+                                      value={editUsername}
+                                      onChange={(e) => setEditUsername(e.target.value)}
+                                    />
+                                    <input
+                                      placeholder="Password baru"
+                                      type="text"
+                                      className="border rounded px-3 py-2 w-full"
+                                      value={editPassword}
+                                      onChange={(e) => setEditPassword(e.target.value)}
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => simpanPasswordWarga(w)}
+                                    className="bg-primary text-white text-xs rounded px-3 py-1.5"
+                                  >
+                                    Simpan Akun Login
+                                  </button>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    ))}
                   {warga.length === 0 && (
                     <tr><td colSpan={4} className="py-4 text-center text-gray-400">Belum ada data.</td></tr>
                   )}

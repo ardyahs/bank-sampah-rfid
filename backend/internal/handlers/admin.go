@@ -131,6 +131,62 @@ func (e *Env) DeleteRumahTangga(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "berhasil dihapus"})
 }
 
+// SetPasswordWargaRequest dipakai admin untuk membuat/mengganti akun login
+// warga (mis. warga lupa password, atau baru mau dikasih akun sekarang).
+type SetPasswordWargaRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (e *Env) SetPasswordWarga(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	var req SetPasswordWargaRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "body tidak valid")
+		return
+	}
+	if req.Username == "" || req.Password == "" {
+		writeError(w, http.StatusBadRequest, "username dan password wajib diisi")
+		return
+	}
+
+	ctx := r.Context()
+
+	var exists string
+	if err := e.DB.QueryRow(ctx, `SELECT id FROM rumah_tangga WHERE id = $1`, id).Scan(&exists); err != nil {
+		writeError(w, http.StatusNotFound, "rumah tangga tidak ditemukan")
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "gagal memproses password")
+		return
+	}
+
+	tag, err := e.DB.Exec(ctx,
+		`UPDATE pengguna SET username = $1, password_hash = $2 WHERE rumah_tangga_id = $3 AND role = 'warga'`,
+		req.Username, string(hash), id,
+	)
+	if err != nil {
+		writeError(w, http.StatusConflict, "gagal memperbarui akun (username mungkin sudah dipakai)")
+		return
+	}
+
+	if tag.RowsAffected() == 0 {
+		_, err = e.DB.Exec(ctx,
+			`INSERT INTO pengguna (rumah_tangga_id, username, password_hash, role) VALUES ($1, $2, $3, 'warga')`,
+			id, req.Username, string(hash),
+		)
+		if err != nil {
+			writeError(w, http.StatusConflict, "gagal membuat akun (username mungkin sudah dipakai)")
+			return
+		}
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"status": "akun warga berhasil diperbarui"})
+}
+
 // ---------- Jenis Sampah ----------
 
 func (e *Env) ListJenisSampah(w http.ResponseWriter, r *http.Request) {

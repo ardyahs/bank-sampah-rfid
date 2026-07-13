@@ -82,6 +82,7 @@ func main() {
 				r.Post("/admin/warga", env.CreateRumahTangga)
 				r.Put("/admin/warga/{id}", env.UpdateRumahTangga)
 				r.Delete("/admin/warga/{id}", env.DeleteRumahTangga)
+				r.Put("/admin/warga/{id}/password", env.SetPasswordWarga)
 
 				r.Post("/admin/produk", env.CreateProduk)
 				r.Put("/admin/produk/{id}", env.UpdateProduk)

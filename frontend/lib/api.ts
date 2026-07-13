@@ -72,6 +72,12 @@ export const api = {
   deleteWarga: (id: string) =>
     request<any>(`/api/admin/warga/${id}`, { method: "DELETE" }),
 
+  setPasswordWarga: (id: string, username: string, password: string) =>
+    request<any>(`/api/admin/warga/${id}/password`, {
+      method: "PUT",
+      body: JSON.stringify({ username, password }),
+    }),
+
   createProduk: (payload: any) =>
     request<any>("/api/admin/produk", { method: "POST", body: JSON.stringify(payload) }),
   updateProduk: (id: string, payload: any) =>
