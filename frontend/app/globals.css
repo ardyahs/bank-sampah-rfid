@@ -3,5 +3,64 @@
 @tailwind utilities;
 
 body {
-  background-color: #f3f4f6;
+  min-height: 100vh;
+  color: #1f2937;
+  background-color: #f0fdf4;
+  background-image:
+    radial-gradient(1200px 600px at 100% -10%, rgba(34, 197, 94, 0.12), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(74, 222, 128, 0.1), transparent 55%),
+    linear-gradient(180deg, #f0fdf4 0%, #f7fefb 45%, #ffffff 100%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  /* Kartu putih dengan aksen hijau lembut */
+  .eco-card {
+    @apply bg-white rounded-2xl border border-green-100 shadow-eco-sm;
+  }
+
+  /* Input & select seragam */
+  .eco-input {
+    @apply w-full border border-green-200 rounded-lg px-3 py-2 bg-white text-sm text-gray-800 outline-none transition
+           placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20;
+  }
+
+  /* Tombol utama hijau */
+  .eco-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium transition
+           active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .eco-btn-primary {
+    @apply eco-btn bg-primary text-white shadow-eco-sm hover:bg-primary-dark;
+  }
+  .eco-btn-ghost {
+    @apply eco-btn bg-white text-primary-dark border border-green-200 hover:bg-green-50;
+  }
+
+  /* Judul bagian */
+  .eco-title {
+    @apply font-semibold text-forest;
+  }
+
+  /* Tabel seragam */
+  .eco-table {
+    @apply w-full text-sm;
+  }
+  .eco-table thead tr {
+    @apply text-left text-green-800/70 border-b border-green-100 bg-green-50/60;
+  }
+  .eco-table th {
+    @apply py-3 px-4 font-semibold;
+  }
+  .eco-table tbody tr {
+    @apply border-b border-green-50 last:border-0 transition-colors hover:bg-green-50/40;
+  }
+  .eco-table td {
+    @apply py-3 px-4;
+  }
+
+  /* Badge kecil */
+  .eco-badge {
+    @apply inline-flex items-center gap-1 rounded-full bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5;
+  }
 }

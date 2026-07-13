@@ -109,27 +109,43 @@ export default function WargaPage() {
   }
 
   if (loading) {
-    return <p className="p-6">Memuat...</p>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
+        <span className="text-4xl animate-pulse" aria-hidden>♻️</span>
+        <p className="text-green-700/80 text-sm">Memuat...</p>
+      </div>
+    );
   }
 
   return (
     <div>
       <Navbar user={user} />
-      <main className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="bg-white rounded-lg shadow p-6 text-center">
-          <p className="text-gray-500 text-sm">Saldo Poin Anda</p>
-          <p className="text-4xl font-bold text-primary">{poin.toLocaleString("id-ID")}</p>
+      <main className="max-w-4xl mx-auto p-5 sm:p-6 space-y-6">
+        {/* Kartu saldo poin */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-white p-7 shadow-eco">
+          <div className="absolute -right-6 -top-8 text-[120px] opacity-15 select-none" aria-hidden>
+            🌿
+          </div>
+          <p className="text-green-50/90 text-sm">Saldo Poin Anda</p>
+          <p className="text-5xl font-extrabold tracking-tight mt-1">
+            {poin.toLocaleString("id-ID")}
+          </p>
+          <p className="text-green-50/80 text-xs mt-2">
+            Terus setor sampahmu untuk menambah poin 🌱
+          </p>
         </div>
 
         {pesan && (
-          <div className="bg-blue-50 text-blue-700 text-sm p-3 rounded">{pesan}</div>
+          <div className="bg-green-50 border border-green-100 text-green-800 text-sm p-3 rounded-lg flex items-center gap-2">
+            <span aria-hidden>✅</span> {pesan}
+          </div>
         )}
 
         {kontak && (kontak.whatsapp || kontak.telepon || kontak.email || kontak.alamat) && (
-          <section className="bg-white rounded-lg shadow p-6">
-            <h2 className="font-semibold mb-3">Butuh Bantuan? Hubungi Kami</h2>
+          <section className="eco-card p-6">
+            <h2 className="eco-title mb-3 flex items-center gap-2">📞 Butuh Bantuan? Hubungi Kami</h2>
             <div className="text-sm text-gray-700 space-y-1">
-              {kontak.nama_kontak && <p className="font-medium">{kontak.nama_kontak}</p>}
+              {kontak.nama_kontak && <p className="font-medium text-gray-800">{kontak.nama_kontak}</p>}
               {kontak.whatsapp && (
                 <p>
                   WhatsApp:{" "}
@@ -137,7 +153,7 @@ export default function WargaPage() {
                     href={`https://wa.me/${kontak.whatsapp}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary underline"
+                    className="text-primary font-medium underline underline-offset-2 hover:text-primary-dark"
                   >
                     {kontak.whatsapp}
                   </a>
@@ -153,105 +169,126 @@ export default function WargaPage() {
           </section>
         )}
 
-        <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="font-semibold mb-4">Tukar Poin</h2>
+        <section className="eco-card p-6">
+          <h2 className="eco-title mb-4 flex items-center gap-2">🎁 Tukar Poin</h2>
           <div className="grid sm:grid-cols-2 gap-4">
-            {produk.map((p) => (
-              <div key={p.id} className="border rounded-lg p-4 flex flex-col gap-2">
-                <p className="font-medium">{p.nama}</p>
-                <p className="text-sm text-gray-500">
-                  {p.poin_dibutuhkan.toLocaleString("id-ID")} poin - stok {p.stok}
-                </p>
-                <button
-                  onClick={() => tukar(p.id)}
-                  disabled={poin < p.poin_dibutuhkan || p.stok <= 0}
-                  className="mt-auto bg-primary text-white text-sm rounded py-1.5 disabled:opacity-40"
+            {produk.map((p) => {
+              const kurang = poin < p.poin_dibutuhkan;
+              const habis = p.stok <= 0;
+              return (
+                <div
+                  key={p.id}
+                  className="border border-green-100 rounded-xl p-4 flex flex-col gap-2 bg-green-50/30 hover:shadow-eco-sm transition"
                 >
-                  Tukar
-                </button>
-              </div>
-            ))}
+                  <p className="font-semibold text-gray-800">{p.nama}</p>
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="eco-badge">{p.poin_dibutuhkan.toLocaleString("id-ID")} poin</span>
+                    <span className={`text-xs ${habis ? "text-red-500" : "text-gray-500"}`}>
+                      stok {p.stok}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => tukar(p.id)}
+                    disabled={kurang || habis}
+                    className="eco-btn-primary mt-auto text-sm py-2"
+                  >
+                    {habis ? "Stok Habis" : kurang ? "Poin Belum Cukup" : "Tukar Sekarang"}
+                  </button>
+                </div>
+              );
+            })}
             {produk.length === 0 && (
               <p className="text-gray-400 text-sm">Belum ada produk tukar tersedia.</p>
             )}
           </div>
         </section>
 
-        <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="font-semibold mb-4">Riwayat Setor Sampah</h2>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="py-2">Tanggal</th>
-                <th>Jenis</th>
-                <th>Berat (kg)</th>
-                <th>Poin</th>
-              </tr>
-            </thead>
-            <tbody>
-              {riwayat.map((r) => (
-                <tr key={r.id} className="border-b last:border-0">
-                  <td className="py-2">{new Date(r.created_at).toLocaleString("id-ID")}</td>
-                  <td>{r.jenis_sampah_nama}</td>
-                  <td>{r.berat_kg}</td>
-                  <td>{r.poin_didapat}</td>
-                </tr>
-              ))}
-              {riwayat.length === 0 && (
+        <section className="eco-card p-6">
+          <h2 className="eco-title mb-4 flex items-center gap-2">📋 Riwayat Setor Sampah</h2>
+          <div className="overflow-x-auto">
+            <table className="eco-table">
+              <thead>
                 <tr>
-                  <td colSpan={4} className="py-4 text-center text-gray-400">
-                    Belum ada riwayat setor.
-                  </td>
+                  <th>Tanggal</th>
+                  <th>Jenis</th>
+                  <th>Berat (kg)</th>
+                  <th>Poin</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {riwayat.map((r) => (
+                  <tr key={r.id}>
+                    <td>{new Date(r.created_at).toLocaleString("id-ID")}</td>
+                    <td>{r.jenis_sampah_nama}</td>
+                    <td>{r.berat_kg}</td>
+                    <td className="font-medium text-primary-dark">+{r.poin_didapat}</td>
+                  </tr>
+                ))}
+                {riwayat.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-6 text-center text-gray-400">
+                      Belum ada riwayat setor.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
 
-        <section className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="font-semibold">Leaderboard — Paling Sering Menyetor</h2>
+        <section className="eco-card p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+            <h2 className="eco-title flex items-center gap-2">🏆 Leaderboard — Paling Sering Menyetor</h2>
             <input
-              className="border rounded px-2 py-1 text-xs ml-auto"
+              className="eco-input text-xs sm:ml-auto sm:w-44"
               placeholder="Filter RT atau 'semua'"
               value={leaderboardRt}
               onChange={(e) => setLeaderboardRt(e.target.value || "semua")}
             />
           </div>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-gray-500 border-b">
-                <th className="py-2">#</th>
-                <th>Kepala Keluarga</th>
-                <th>RT</th>
-                <th>Jumlah Setor</th>
-                <th>Total Poin</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaderboard.slice(0, 10).map((row, i) => (
-                <tr
-                  key={row.rumah_tangga_id}
-                  className={`border-b last:border-0 ${
-                    row.rumah_tangga_id === user?.rumah_tangga_id ? "bg-green-50 font-medium" : ""
-                  }`}
-                >
-                  <td className="py-2">{i + 1}</td>
-                  <td>{row.nama_kepala_keluarga}</td>
-                  <td>{row.rt}</td>
-                  <td>{row.jumlah_setor}x</td>
-                  <td>{row.total_poin.toLocaleString("id-ID")}</td>
-                </tr>
-              ))}
-              {leaderboard.length === 0 && (
+          <div className="overflow-x-auto">
+            <table className="eco-table">
+              <thead>
                 <tr>
-                  <td colSpan={5} className="py-4 text-center text-gray-400">
-                    Belum ada data.
-                  </td>
+                  <th>#</th>
+                  <th>Kepala Keluarga</th>
+                  <th>RT</th>
+                  <th>Jumlah Setor</th>
+                  <th>Total Poin</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {leaderboard.slice(0, 10).map((row, i) => {
+                  const isSaya = row.rumah_tangga_id === user?.rumah_tangga_id;
+                  return (
+                    <tr key={row.rumah_tangga_id} className={isSaya ? "bg-green-100/70 font-medium" : ""}>
+                      <td>
+                        <span className="font-semibold text-gray-700">
+                          {["🥇", "🥈", "🥉"][i] ?? i + 1}
+                        </span>
+                      </td>
+                      <td>
+                        {row.nama_kepala_keluarga}
+                        {isSaya && <span className="eco-badge ml-2">Anda</span>}
+                      </td>
+                      <td>{row.rt}</td>
+                      <td>{row.jumlah_setor}x</td>
+                      <td className="font-semibold text-primary-dark">
+                        {row.total_poin.toLocaleString("id-ID")}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {leaderboard.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-gray-400">
+                      Belum ada data.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>

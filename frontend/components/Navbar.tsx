@@ -12,19 +12,32 @@ export default function Navbar({ user }: { user: SessionUser | null }) {
   }
 
   return (
-    <nav className="bg-primary text-white px-6 py-4 flex items-center justify-between shadow">
-      <div className="font-semibold text-lg">Bank Sampah Digital RFID</div>
-      {user && (
-        <div className="flex items-center gap-4 text-sm">
-          <span className="opacity-90">Hai, {user.username}</span>
-          <button
-            onClick={logout}
-            className="bg-white text-primary px-3 py-1 rounded hover:bg-gray-100"
-          >
-            Keluar
-          </button>
+    <nav className="sticky top-0 z-20 bg-primary/95 backdrop-blur text-white shadow-eco">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 py-3.5 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/20 text-lg" aria-hidden>
+            ♻️
+          </span>
+          <div className="leading-tight">
+            <div className="font-semibold text-[15px]">Bank Sampah Digital</div>
+            <div className="text-[11px] text-green-50/80 -mt-0.5">Ramah lingkungan · berbasis RFID</div>
+          </div>
         </div>
-      )}
+
+        {user && (
+          <div className="flex items-center gap-3 text-sm">
+            <span className="hidden sm:inline text-green-50/90">
+              Hai, <span className="font-medium">{user.username}</span>
+            </span>
+            <button
+              onClick={logout}
+              className="bg-white/95 text-primary-dark font-medium px-3.5 py-1.5 rounded-lg hover:bg-white transition active:scale-[0.98]"
+            >
+              Keluar
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }

@@ -19,8 +19,9 @@ export default function Home() {
   }, [router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-500">Memuat...</p>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-3">
+      <span className="text-4xl animate-pulse" aria-hidden>♻️</span>
+      <p className="text-green-700/80 text-sm">Memuat...</p>
     </div>
   );
 }
