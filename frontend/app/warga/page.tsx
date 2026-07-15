@@ -156,94 +156,6 @@ export default function WargaPage() {
           </div>
         )}
 
-        {kontak && (kontak.whatsapp || kontak.telepon || kontak.email || kontak.alamat) && (
-          <section className="eco-card overflow-hidden">
-            {/* Header dengan aksen hijau */}
-            <div className="relative bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-5">
-              <MessageCircle className="absolute -right-3 -bottom-5 w-28 h-28 opacity-15 select-none" aria-hidden />
-              <h2 className="font-semibold text-lg flex items-center gap-2">
-                Butuh Bantuan?
-              </h2>
-              <p className="text-green-50/90 text-sm mt-0.5 flex items-center gap-1.5">
-                Tim bank sampah siap membantu Anda <Sprout className="w-3.5 h-3.5" />
-              </p>
-              {kontak.nama_kontak && (
-                <div className="mt-3 inline-flex items-center gap-2 bg-white/15 rounded-full pl-1 pr-3 py-1">
-                  <span className="grid place-items-center w-6 h-6 rounded-full bg-white/25" aria-hidden>
-                    <User className="w-3.5 h-3.5" />
-                  </span>
-                  <span className="text-sm font-medium">{kontak.nama_kontak}</span>
-                </div>
-              )}
-            </div>
-
-            <div className="p-5 space-y-4">
-              {/* Tombol WhatsApp utama */}
-              {kontak.whatsapp && (
-                <a
-                  href={`https://wa.me/${kontak.whatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 p-3.5 transition hover:bg-green-100 hover:shadow-eco-sm active:scale-[0.99]"
-                >
-                  <span className="grid place-items-center w-11 h-11 rounded-xl bg-primary text-white shadow-eco-sm" aria-hidden>
-                    <MessageCircle className="w-6 h-6" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-xs text-gray-500">Chat via WhatsApp</span>
-                    <span className="block font-semibold text-primary-dark truncate">{kontak.whatsapp}</span>
-                  </span>
-                  <ChevronRight className="ml-auto w-5 h-5 text-primary-dark" aria-hidden />
-                </a>
-              )}
-
-              {/* Detail kontak lain */}
-              <div className="grid sm:grid-cols-2 gap-2.5 text-sm">
-                {kontak.telepon && (
-                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <Phone className="w-5 h-5 text-primary shrink-0" aria-hidden />
-                    <span className="min-w-0">
-                      <span className="block text-xs text-gray-500">Telepon</span>
-                      <a href={`tel:${kontak.telepon}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
-                        {kontak.telepon}
-                      </a>
-                    </span>
-                  </div>
-                )}
-                {kontak.email && (
-                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <Mail className="w-5 h-5 text-primary shrink-0" aria-hidden />
-                    <span className="min-w-0">
-                      <span className="block text-xs text-gray-500">Email</span>
-                      <a href={`mailto:${kontak.email}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
-                        {kontak.email}
-                      </a>
-                    </span>
-                  </div>
-                )}
-                {kontak.alamat && (
-                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <MapPin className="w-5 h-5 text-primary shrink-0" aria-hidden />
-                    <span className="min-w-0">
-                      <span className="block text-xs text-gray-500">Alamat</span>
-                      <span className="font-medium text-gray-800">{kontak.alamat}</span>
-                    </span>
-                  </div>
-                )}
-                {kontak.jam_operasional && (
-                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
-                    <Clock className="w-5 h-5 text-primary shrink-0" aria-hidden />
-                    <span className="min-w-0">
-                      <span className="block text-xs text-gray-500">Jam Operasional</span>
-                      <span className="font-medium text-gray-800">{kontak.jam_operasional}</span>
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-
         <section className="eco-card p-6">
           <h2 className="eco-title mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-primary" /> Tukar Poin
@@ -367,6 +279,94 @@ export default function WargaPage() {
             </table>
           </div>
         </section>
+
+        {kontak && (kontak.whatsapp || kontak.telepon || kontak.email || kontak.alamat) && (
+          <section className="eco-card overflow-hidden">
+            {/* Header dengan aksen hijau */}
+            <div className="relative bg-gradient-to-r from-primary to-primary-dark text-white px-6 py-5">
+              <MessageCircle className="absolute -right-3 -bottom-5 w-28 h-28 opacity-15 select-none" aria-hidden />
+              <h2 className="font-semibold text-lg flex items-center gap-2">
+                Butuh Bantuan?
+              </h2>
+              <p className="text-green-50/90 text-sm mt-0.5 flex items-center gap-1.5">
+                Tim bank sampah siap membantu Anda <Sprout className="w-3.5 h-3.5" />
+              </p>
+              {kontak.nama_kontak && (
+                <div className="mt-3 inline-flex items-center gap-2 bg-white/15 rounded-full pl-1 pr-3 py-1">
+                  <span className="grid place-items-center w-6 h-6 rounded-full bg-white/25" aria-hidden>
+                    <User className="w-3.5 h-3.5" />
+                  </span>
+                  <span className="text-sm font-medium">{kontak.nama_kontak}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-5 space-y-4">
+              {/* Tombol WhatsApp utama */}
+              {kontak.whatsapp && (
+                <a
+                  href={`https://wa.me/${kontak.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 p-3.5 transition hover:bg-green-100 hover:shadow-eco-sm active:scale-[0.99]"
+                >
+                  <span className="grid place-items-center w-11 h-11 rounded-xl bg-primary text-white shadow-eco-sm" aria-hidden>
+                    <MessageCircle className="w-6 h-6" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs text-gray-500">Chat via WhatsApp</span>
+                    <span className="block font-semibold text-primary-dark truncate">{kontak.whatsapp}</span>
+                  </span>
+                  <ChevronRight className="ml-auto w-5 h-5 text-primary-dark" aria-hidden />
+                </a>
+              )}
+
+              {/* Detail kontak lain */}
+              <div className="grid sm:grid-cols-2 gap-2.5 text-sm">
+                {kontak.telepon && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <Phone className="w-5 h-5 text-primary shrink-0" aria-hidden />
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Telepon</span>
+                      <a href={`tel:${kontak.telepon}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
+                        {kontak.telepon}
+                      </a>
+                    </span>
+                  </div>
+                )}
+                {kontak.email && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <Mail className="w-5 h-5 text-primary shrink-0" aria-hidden />
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Email</span>
+                      <a href={`mailto:${kontak.email}`} className="font-medium text-gray-800 hover:text-primary-dark truncate block">
+                        {kontak.email}
+                      </a>
+                    </span>
+                  </div>
+                )}
+                {kontak.alamat && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <MapPin className="w-5 h-5 text-primary shrink-0" aria-hidden />
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Alamat</span>
+                      <span className="font-medium text-gray-800">{kontak.alamat}</span>
+                    </span>
+                  </div>
+                )}
+                {kontak.jam_operasional && (
+                  <div className="flex items-center gap-3 rounded-lg bg-green-50/50 border border-green-100 px-3 py-2.5">
+                    <Clock className="w-5 h-5 text-primary shrink-0" aria-hidden />
+                    <span className="min-w-0">
+                      <span className="block text-xs text-gray-500">Jam Operasional</span>
+                      <span className="font-medium text-gray-800">{kontak.jam_operasional}</span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
