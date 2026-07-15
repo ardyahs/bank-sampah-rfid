@@ -113,7 +113,6 @@ export default function AdminPage() {
   const [produkList, setProdukList] = useState<Produk[]>([]);
   const [editStok, setEditStok] = useState<Record<string, number>>({});
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
-  const [leaderboardRt, setLeaderboardRt] = useState("semua");
   const [cariLeaderboard, setCariLeaderboard] = useState("");
   const [wargaForm, setWargaForm] = useState(emptyWargaForm);
   const [produkForm, setProdukForm] = useState(emptyProdukForm);
@@ -147,10 +146,10 @@ export default function AdminPage() {
   useEffect(() => {
     if (!user || tab !== "leaderboard") return;
     api
-      .leaderboard(leaderboardRt)
+      .leaderboard("semua")
       .then(setLeaderboard)
       .catch((err) => setPesan(err instanceof ApiError ? err.message : "Gagal memuat leaderboard"));
-  }, [user, tab, leaderboardRt]);
+  }, [user, tab]);
 
   useEffect(() => {
     if (!user || tab !== "kontak") return;
@@ -744,12 +743,6 @@ export default function AdminPage() {
                   onChange={(e) => setCariLeaderboard(e.target.value)}
                 />
               </div>
-              <input
-                className="eco-input text-sm sm:w-44"
-                placeholder="Filter RT (mis. 03)"
-                value={leaderboardRt}
-                onChange={(e) => setLeaderboardRt(e.target.value || "semua")}
-              />
             </div>
             <div className="eco-card overflow-hidden">
               <div className="overflow-x-auto">
