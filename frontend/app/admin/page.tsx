@@ -114,6 +114,7 @@ export default function AdminPage() {
   const [editStok, setEditStok] = useState<Record<string, number>>({});
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [leaderboardRt, setLeaderboardRt] = useState("semua");
+  const [cariLeaderboard, setCariLeaderboard] = useState("");
   const [wargaForm, setWargaForm] = useState(emptyWargaForm);
   const [produkForm, setProdukForm] = useState(emptyProdukForm);
   const [manualForm, setManualForm] = useState(emptyManualForm);
@@ -734,9 +735,18 @@ export default function AdminPage() {
               <p className="text-sm text-gray-500">
                 Ranking rumah tangga yang paling sering menyetor sampah.
               </p>
+              <div className="relative w-full sm:w-64 sm:ml-auto">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" aria-hidden />
+                <input
+                  className="eco-input text-sm w-full pl-9"
+                  placeholder="Cari nama warga..."
+                  value={cariLeaderboard}
+                  onChange={(e) => setCariLeaderboard(e.target.value)}
+                />
+              </div>
               <input
-                className="eco-input text-sm sm:ml-auto sm:w-56"
-                placeholder="Filter RT (mis. 03) atau 'semua'"
+                className="eco-input text-sm sm:w-44"
+                placeholder="Filter RT (mis. 03)"
                 value={leaderboardRt}
                 onChange={(e) => setLeaderboardRt(e.target.value || "semua")}
               />
@@ -755,19 +765,36 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {leaderboard.map((row, i) => (
-                    <tr key={row.rumah_tangga_id}>
-                      <td><RankBadge index={i} /></td>
-                      <td className="font-medium text-gray-800">{row.nama_kepala_keluarga}</td>
-                      <td>{row.rt}</td>
-                      <td><span className="eco-badge">{row.jumlah_setor}x</span></td>
-                      <td>{row.total_berat_kg}</td>
-                      <td className="font-semibold text-primary-dark">{row.total_poin.toLocaleString("id-ID")}</td>
-                    </tr>
-                  ))}
-                  {leaderboard.length === 0 && (
-                    <tr><td colSpan={6} className="py-6 text-center text-gray-400">Belum ada data.</td></tr>
-                  )}
+                  {(() => {
+                    const hasil = leaderboard
+                      .map((row, i) => ({ row, peringkat: i }))
+                      .filter(({ row }) =>
+                        row.nama_kepala_keluarga
+                          .toLowerCase()
+                          .includes(cariLeaderboard.trim().toLowerCase())
+                      );
+                    if (hasil.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan={6} className="py-6 text-center text-gray-400">
+                            {leaderboard.length === 0
+                              ? "Belum ada data."
+                              : `Tidak ada warga dengan nama "${cariLeaderboard}".`}
+                          </td>
+                        </tr>
+                      );
+                    }
+                    return hasil.map(({ row, peringkat }) => (
+                      <tr key={row.rumah_tangga_id}>
+                        <td><RankBadge index={peringkat} /></td>
+                        <td className="font-medium text-gray-800">{row.nama_kepala_keluarga}</td>
+                        <td>{row.rt}</td>
+                        <td><span className="eco-badge">{row.jumlah_setor}x</span></td>
+                        <td>{row.total_berat_kg}</td>
+                        <td className="font-semibold text-primary-dark">{row.total_poin.toLocaleString("id-ID")}</td>
+                      </tr>
+                    ));
+                  })()}
                 </tbody>
               </table>
               </div>
