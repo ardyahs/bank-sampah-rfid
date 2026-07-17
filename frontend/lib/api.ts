@@ -99,6 +99,15 @@ export const api = {
 
   semuaTransaksiTukar: () => request<any[]>("/api/admin/transaksi-tukar"),
 
+  pendingList: () => request<any[]>("/api/admin/pending"),
+  prosesPending: (id: string, jenisSampahId: string, beratKg: number) =>
+    request<any>(`/api/admin/pending/${id}/proses`, {
+      method: "POST",
+      body: JSON.stringify({ jenis_sampah_id: jenisSampahId, berat_kg: beratKg }),
+    }),
+  hapusPending: (id: string) =>
+    request<any>(`/api/admin/pending/${id}`, { method: "DELETE" }),
+
   setorManual: (rumahTanggaId: string, jenisSampahId: string, beratKg: number) =>
     request<any>("/api/admin/setor-manual", {
       method: "POST",

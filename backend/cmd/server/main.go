@@ -62,6 +62,7 @@ func main() {
 
 		// Endpoint khusus ESP32 (pakai device key, bukan JWT)
 		r.With(appmw.DeviceKey(deviceKey)).Post("/scan", env.Scan)
+		r.With(appmw.DeviceKey(deviceKey)).Post("/scan-pending", env.ScanPending)
 
 		// Butuh login (JWT)
 		r.Group(func(r chi.Router) {
@@ -92,6 +93,9 @@ func main() {
 				r.Get("/admin/transaksi", env.ListSemuaTransaksi)
 				r.Get("/admin/transaksi-tukar", env.ListSemuaTransaksiTukar)
 				r.Post("/admin/setor-manual", env.ManualSetor)
+				r.Get("/admin/pending", env.ListPending)
+				r.Post("/admin/pending/{id}/proses", env.ProsesPending)
+				r.Delete("/admin/pending/{id}", env.HapusPending)
 				r.Put("/admin/kontak", env.UpdateKontak)
 			})
 		})
